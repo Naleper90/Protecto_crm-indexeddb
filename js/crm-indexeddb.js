@@ -21,15 +21,12 @@ request.onupgradeneeded = function(event) {
     }
 };
 
-// --- VALIDACIONES ---
-// TODO: Implementad validaciones usando expresiones regulares y eventos 'onblur'
-// Elimina el código de validación y manejo de clases visuales para que ellos lo desarrollen
+// Validaciones y activar botón
+
 const form = document.getElementById('client-form');
 const addBtn = document.getElementById('add-btn');
 const inputs = form.querySelectorAll('input');
 
-// --- Validaciones y activación botón ---
-// Dejar el botón siempre deshabilitado. Que alumnos lo activen cuando validen campos
 addBtn.disabled = true; 
 
 const nameInput = document.getElementById('name');
@@ -82,12 +79,31 @@ function checkFormValidity() {
     }
 }
 
-// --- AGREGAR CLIENTE ---
-// TODO: Implementar la función que capture los datos y los agregue a IndexedDB
-form.addEventListener('submit', e => {
+// Agregar cliente
+form.addEventListener('submit', function(e) {
     e.preventDefault();
-    // Código para agregar cliente eliminado para valoración
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+
+    const transaction = db.transaction(["clients"], "readwrite");
+    const store = transaction.objectStore("clients");
+
+    const newClient = { name, email, phone };
+    const request = store.add(newClient);
+
+    request.onsuccess = function() {
+        alert("Cliente guardado con éxito.")
+        form.reset();
+        [nameInput, emailInput, phoneInput].forEach(inp => inp.classList.remove("valid", "invalid"));
+        addBtn.disabled = true;
+        fetchClients(); 
+    };
+    request.onerror = function() {
+        alert("No se pudo agregar el cliente, email ya existente.");
+    };
 });
+
 
 // --- LISTADO DINÁMICO ---
 // TODO: Implementar función para mostrar clientes guardados en IndexedDB

@@ -6,13 +6,13 @@ En progreso. Actualmente incluye:
 
 - Estructura inicial del proyecto (HTML, CSS, JS)
 
-- Validación de campos del formulario cliente con expresiones regulares
+- Validación de campos del formulario cliente, email y teléfono
 
 - Activación dinámica del botón "Agregar Cliente" solo cuando los datos son válidos
 
 - Inicio de integración con IndexedDB (creación de la base y almacén)
 
-- Primer commit subido a GitHub
+- Implementada la función para insertar clientes en IndexedDB
 
 ## 📁 Estructura de carpetas
 ```
@@ -41,10 +41,6 @@ Protecto_crm-indexeddb/
 - Preparación del listener para enviar el formulario y almacenar los datos en IndexedDB
 
 ## 🔜 Próximos pasos
-- Completar la validación de los campos de email y teléfono
-
-- Implementar la función para insertar clientes en IndexedDB
-
 - Listar los clientes guardados en pantalla
 
 - Añadir funciones para editar y eliminar clientes
