@@ -42,9 +42,11 @@ Protecto_crm-indexeddb/
 
 - Listar los clientes guardados en pantalla
 
+- Añadir la función de eliminar cliente
+
 ## 🔜 Próximos pasos
 
-- Añadir funciones para editar y eliminar clientes
+- Añadir funciones para editar
 
 ## 🛠️ Cómo colaborar o probar
 1. Clona el repositorio:

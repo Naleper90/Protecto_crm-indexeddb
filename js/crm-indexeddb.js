@@ -93,6 +93,7 @@ form.addEventListener('submit', function(e) {
     const request = store.add(newClient);
 
     request.onsuccess = function() {
+        console.log('Nuevo cliente id:', event.target.result);
         alert("Cliente guardado con éxito.")
         form.reset();
         nameInput.classList.remove("valid", "invalid");
@@ -146,6 +147,19 @@ window.editClient = function(id) {
 
 // --- ELIMINAR CLIENTE ---
 window.deleteClient = function(id) {
+    const confirmar = confirm('¿Eliminar cliente?');
+    if (!confirmar) {
+        return;
+    }
+
+    const transaction = db.transaction(['clients'], 'readwrite');
+    const store = transaction.objectStore('clients');
+    const request = store.delete(Number(id));
+
+    request.onsuccess = function() {
+        alert('Cliente eliminado.')
+        fetchClients();
+    };
     // Código eliminado para implementación del alumno
 };
 
