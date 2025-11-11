@@ -36,7 +36,7 @@ const emailInput = document.getElementById('email');
 const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 
 const phoneInput = document.getElementById('phone');
-const phoneRegex = /^[0-9]{9}$/;
+const phoneRegex = /^\d{3}-?\d{3}-?\d{3,4}$/;
 
 nameInput.addEventListener('blur', function() {
     if(nameRegex.test(nameInput.value.trim())) {
@@ -95,20 +95,48 @@ form.addEventListener('submit', function(e) {
     request.onsuccess = function() {
         alert("Cliente guardado con éxito.")
         form.reset();
-        [nameInput, emailInput, phoneInput].forEach(inp => inp.classList.remove("valid", "invalid"));
+        nameInput.classList.remove("valid", "invalid");
+        emailInput.classList.remove("valid", "invalid");
+        phoneInput.classList.remove("valid", "invalid");
         addBtn.disabled = true;
         fetchClients(); 
     };
     request.onerror = function() {
-        alert("No se pudo agregar el cliente, email ya existente.");
+        alert("No se pudo agregar el cliente, email ya existente.")
     };
 });
 
 
-// --- LISTADO DINÁMICO ---
-// TODO: Implementar función para mostrar clientes guardados en IndexedDB
+// Listado dinámico
 function fetchClients() {
-    // Código eliminado para que alumnos implementen mecanismo de lectura
+    const clientList = document.getElementById('client-list');
+    clientList.innerHTML = '';
+
+    const transaction = db.transaction(['clients'], 'readonly');
+    const store = transaction.objectStore('clients');
+
+    const request = store.getAll();
+
+    request.onsuccess = function() {
+        const clients = request.result;
+
+        if (clients.length === 0) {
+            clientList.innerHTML = '<li>No hay clientes registrados.</li>';
+            return;
+        }
+
+        clients.forEach(client => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span><strong>${client.name}</strong> - ${client.email} - ${client.phone}</span>
+                <div class="actions">
+                    <button onclick="editClient(${client.id})">Editar</button>
+                    <button onclick="deleteClient(${client.id})">Eliminar</button>
+                </div>
+            `;
+            clientList.appendChild(li);
+        });
+    }
 }
 
 // --- EDITAR CLIENTE ---

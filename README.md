@@ -40,8 +40,9 @@ Protecto_crm-indexeddb/
 
 - Preparación del listener para enviar el formulario y almacenar los datos en IndexedDB
 
-## 🔜 Próximos pasos
 - Listar los clientes guardados en pantalla
+
+## 🔜 Próximos pasos
 
 - Añadir funciones para editar y eliminar clientes
 
@@ -62,4 +63,5 @@ git clone https://github.com/Naleper90/Protecto_crm-indexeddb.git
 
 # 🙋‍♂️ Autor
 Natalia Alejo Pérez - Estudiante de 2º DAW
+
 Enlace al repositorio: [https://github.com/Naleper90/Protecto_crm-indexeddb.git](https://github.com/Naleper90/Protecto_crm-indexeddb.git) 
