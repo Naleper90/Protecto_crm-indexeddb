@@ -44,8 +44,6 @@ Protecto_crm-indexeddb/
 
 - Añadir la función de eliminar cliente
 
-## 🔜 Próximos pasos
-
 - Añadir funciones para editar
 
 ## 🛠️ Cómo colaborar o probar

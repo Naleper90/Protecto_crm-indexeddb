@@ -85,28 +85,48 @@ form.addEventListener('submit', function(e) {
     const name = nameInput.value.trim();
     const email = emailInput.value.trim();
     const phone = phoneInput.value.trim();
+    
+    if (!form.dataset.editingId) {
+        const transaction = db.transaction(["clients"], "readwrite");
+        const store = transaction.objectStore("clients");
+        const newClient = { name, email, phone };
+        const request = store.add(newClient);
+        request.onsuccess = function() {
+            alert("Cliente guardado con éxito.");
+            form.reset();
+            addBtn.textContent = "Agregar Cliente";
+            addBtn.disabled = true;
+            nameInput.classList.remove("valid", "invalid");
+            emailInput.classList.remove("valid", "invalid");
+            phoneInput.classList.remove("valid", "invalid");
+            fetchClients();
+        };
+        request.onerror = function() {
+            alert("No se pudo agregar el cliente, email ya existente.");
+        };
+        return;
+    }
 
+    const id = Number(form.dataset.editingId);
+    const updatedClient = { id, name, email, phone };
     const transaction = db.transaction(["clients"], "readwrite");
     const store = transaction.objectStore("clients");
-
-    const newClient = { name, email, phone };
-    const request = store.add(newClient);
-
+    const request = store.put(updatedClient);
     request.onsuccess = function() {
-        console.log('Nuevo cliente id:', event.target.result);
-        alert("Cliente guardado con éxito.")
+        alert('Cliente actualizado correctamente.');
         form.reset();
-        nameInput.classList.remove("valid", "invalid");
-        emailInput.classList.remove("valid", "invalid");
-        phoneInput.classList.remove("valid", "invalid");
+        form.removeAttribute('data-editing-id');
+        addBtn.textContent = 'Agregar Cliente';
         addBtn.disabled = true;
-        fetchClients(); 
+        nameInput.classList.remove('valid', 'invalid');
+        emailInput.classList.remove('valid', 'invalid');
+        phoneInput.classList.remove('valid', 'invalid');
+        fetchClients();
     };
     request.onerror = function() {
-        alert("No se pudo agregar el cliente, email ya existente.")
+        alert('Error al actualizar el cliente. Email duplicado o error en la BD.');
     };
 });
-
 
 // Listado dinámico
 function fetchClients() {
@@ -140,12 +160,33 @@ function fetchClients() {
     }
 }
 
-// --- EDITAR CLIENTE ---
+// Editar clientes
 window.editClient = function(id) {
-    // Código eliminado para implementación del alumno
+    const transaction = db.transaction(["clients"], "readonly");
+    const store = transaction.objectStore("clients");
+    const request = store.get(Number(id));
+
+    request.onsuccess = function() {
+        const client = request.result;
+        if(!client) {
+            alert('Cliente no encontrado')
+            return;
+        }
+
+        nameInput.value = client.name;
+        emailInput.value = client.email;
+        phoneInput.value = client.phone;
+
+        form.dataset.editingId = client.id;
+        addBtn.textContent = 'Guardar cambios';
+        addBtn.disabled = false;
+        nameInput.classList.add('valid');
+        emailInput.classList.add('valid');
+        phoneInput.classList.add('valid');
+    };
 };
 
-// --- ELIMINAR CLIENTE ---
+// Eliminar cliente
 window.deleteClient = function(id) {
     const confirmar = confirm('¿Eliminar cliente?');
     if (!confirmar) {
@@ -160,6 +201,5 @@ window.deleteClient = function(id) {
         alert('Cliente eliminado.')
         fetchClients();
     };
-    // Código eliminado para implementación del alumno
 };
 
