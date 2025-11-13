@@ -1,15 +1,23 @@
+// INICIALIZACIÓN de INDEXEDDB
+
 let db;
 
 const request = indexedDB.open("CRM_Database", 1);
+
+// Manejo de errores al abrir la base de datos
 
 request.onerror = function(event) {
     console.error("Error abriendo IndexedDB", event);
 };
 
+// Conexión ok
+
 request.onsuccess = function(event) {
     db = event.target.result;
     fetchClients(); // Cargar clientes almacenados
 };
+
+//Crear o actualizar la base de datos (estructura)
 
 request.onupgradeneeded = function(event) {
     db = event.target.result;
@@ -27,17 +35,30 @@ const form = document.getElementById('client-form');
 const addBtn = document.getElementById('add-btn');
 const inputs = form.querySelectorAll('input');
 
+// Botón deshabilitado hasta que todos los campos sean válidos
+
 addBtn.disabled = true; 
 
 const nameInput = document.getElementById('name');
+// Regex para validar nombre: 
+// - Mínimo 2 caracteres
+// - Solo letras (mayúsculas y minúsculas)
+// - Permite espacios, letras con acento (ÁÉÍÓÚ) y la letra ñ
 const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{2,}$/;
 
 const emailInput = document.getElementById('email');
+// Regex para validar email en formato estándar:
+// - usuario: letras, números, puntos, guiones bajos, + y -
+// - @dominio.extensión
 const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 
 const phoneInput = document.getElementById('phone');
+// Regex para validar teléfono:
+// - 9-10 dígitos numéricos
+// - Guiones opcionales entre grupos (formato: 123-456-789 o 123456789)
 const phoneRegex = /^\d{3}-?\d{3}-?\d{3,4}$/;
 
+// Validación en tiempo real del campo nombre
 nameInput.addEventListener('blur', function() {
     if(nameRegex.test(nameInput.value.trim())) {
         nameInput.classList.remove('invalid');
@@ -49,6 +70,7 @@ nameInput.addEventListener('blur', function() {
     checkFormValidity();
 });
 
+// Validación en tiempo real del campo email
 emailInput.addEventListener('blur', function() {
     if(emailRegex.test(emailInput.value.trim())) {
         emailInput.classList.remove('invalid');
@@ -60,6 +82,7 @@ emailInput.addEventListener('blur', function() {
     checkFormValidity();
 });
 
+// Validación en tiempo real del campo teléfono
 phoneInput.addEventListener('blur', function() {
     if(phoneRegex.test(phoneInput.value.trim())) {
         phoneInput.classList.remove('invalid');
@@ -70,6 +93,8 @@ phoneInput.addEventListener('blur', function() {
     }
     checkFormValidity();
 });
+
+// Verifica si todos los campos son válidos para habilitar el botón
 
 function checkFormValidity() {
     if (nameInput.classList.contains('valid') && emailInput.classList.contains('valid') && phoneInput.classList.contains('valid')) {
@@ -86,6 +111,7 @@ form.addEventListener('submit', function(e) {
     const email = emailInput.value.trim();
     const phone = phoneInput.value.trim();
     
+    // Agregar nuevo cliente
     if (!form.dataset.editingId) {
         const transaction = db.transaction(["clients"], "readwrite");
         const store = transaction.objectStore("clients");
@@ -107,6 +133,7 @@ form.addEventListener('submit', function(e) {
         return;
     }
 
+    // Editar cliente existente 
     const id = Number(form.dataset.editingId);
     const updatedClient = { id, name, email, phone };
     const transaction = db.transaction(["clients"], "readwrite");
@@ -129,6 +156,7 @@ form.addEventListener('submit', function(e) {
 });
 
 // Listado dinámico
+
 function fetchClients() {
     const clientList = document.getElementById('client-list');
     clientList.innerHTML = '';
@@ -157,7 +185,12 @@ function fetchClients() {
             `;
             clientList.appendChild(li);
         });
-    }
+    };
+
+    request.onerror = function() {
+        console.error('Error al cargar clientes');
+        clientList.innerHTML = '<li>Error al cargar los clientes</li>';
+    };
 }
 
 // Editar clientes
@@ -200,6 +233,11 @@ window.deleteClient = function(id) {
     request.onsuccess = function() {
         alert('Cliente eliminado.')
         fetchClients();
+    };
+
+    request.onerror = function() {
+        alert('Error al eliminar el cliente.');
+        console.error('Error:', request.error);
     };
 };
 
